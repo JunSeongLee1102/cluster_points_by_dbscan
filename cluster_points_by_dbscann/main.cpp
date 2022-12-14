@@ -1,5 +1,6 @@
 #pragma once
 #define CUDA_API_PER_THREAD_DEFAULT_STREAM
+
 #include <fstream>
 #include <thread>
 #include <iostream>

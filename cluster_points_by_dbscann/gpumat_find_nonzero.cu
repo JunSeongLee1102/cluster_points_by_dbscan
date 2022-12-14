@@ -1,5 +1,5 @@
 #include "gpumat_find_nonzero.cuh"
-//#include <cmath>
+#include <cmath>
 
 
 __global__

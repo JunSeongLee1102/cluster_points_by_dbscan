@@ -15,6 +15,26 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="cluster_points.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="uled_brightness_calculation.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="cuda_utils.cuh">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="dbscan.cuh">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="gpumat_find_nonzero.cuh">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="types.cuh">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
     <ClCompile Include="cluster_points.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
@@ -23,31 +43,14 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="dbscan.cu">
+    <CudaCompile Include="dbscan.cu">
       <Filter>소스 파일</Filter>
-    </None>
-    <None Include="gpumat_find_nonzero.cu">
+    </CudaCompile>
+    <CudaCompile Include="gpumat_find_nonzero.cu">
       <Filter>소스 파일</Filter>
-    </None>
-    <None Include="types.cu">
+    </CudaCompile>
+    <CudaCompile Include="types.cu">
       <Filter>소스 파일</Filter>
-    </None>
-    <None Include="cuda_utils.cuh">
-      <Filter>헤더 파일</Filter>
-    </None>
-    <None Include="dbscan.cuh">
-      <Filter>헤더 파일</Filter>
-    </None>
-    <None Include="gpumat_find_nonzero.cuh">
-      <Filter>헤더 파일</Filter>
-    </None>
-    <None Include="types.cuh">
-      <Filter>헤더 파일</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="cluster_points.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
+    </CudaCompile>
   </ItemGroup>
 </Project>
