@@ -1,0 +1,8 @@
+	time ms			
+	GpumatFindNonzero X		GpumatFindNonzero O	
+n_threads Page-locked X	Page-locked O Page-locked memory X	Page-locked memory O
+1	60.060 	59.769 	44.982 	43.154 
+2	42.699 	41.850 	35.330 	33.300 
+3	39.908 	40.714 	33.465 	31.723 
+4	39.341 	38.556 	33.289 	31.156 
+6	39.140 	37.151 	33.160 	30.410 
