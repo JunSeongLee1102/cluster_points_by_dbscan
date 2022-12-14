@@ -6,7 +6,8 @@
 #include <iostream>
 #include <chrono>
 #include "cluster_points.h"
-
+#include <sys/stat.h>
+#include <sys/types.h>
 
 using namespace std;
 using std::cout;
@@ -28,9 +29,35 @@ void clusterRectsInImageWrapper(ClusterPoints* cluster_points, std::vector<int> 
 		cluster_points->clusterRectsInImage(save_image_indices[i]);
 }
 
+//이미지 저장 디렉토리 유무 확인하고 없으면 만들기
+void makeImgSaveDirectory(bool draw_result)
+{
+	if (draw_result)
+	{
+		struct stat info;
+		int check_directory_creation = 0;
+		if (stat("saved_images", &info) != 0)
+		{
+			std::string dir_name = "saved_images";
+			std::wstring widestr_dir_name = std::wstring(dir_name.begin(), dir_name.end());
+			const wchar_t* wchar_dir_name = widestr_dir_name.c_str();
+			printf("cannot access %s, create directory.\n", "saved_images");
+			check_directory_creation = _wmkdir(wchar_dir_name);
+			if (!check_directory_creation)
+				printf("Directory created\n");
+			else 
+			{
+				printf("Unable to create directory\n");
+				exit(1);
+			}
+		}
+	}
+}
 
 void main()
 {
+	makeImgSaveDirectory(draw_result);
+
 	//더 빠른 처리를 위해서 pinned memory 사용
 	cv::Mat::setDefaultAllocator(cv::cuda::HostMem::getAllocator(cv::cuda::HostMem::AllocType::PAGE_LOCKED));
 
