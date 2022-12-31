@@ -26,7 +26,7 @@ plt.rc('font', **font)
 
 thick=1.5
 fig,ax=plt.subplots(figsize = (10, 6.3))
-plt.xlabel("Img size [pixels]")
+plt.xlabel("Number of threads (streams)")
 plt.ylabel('Process time per\nimage [ms]')
 
 

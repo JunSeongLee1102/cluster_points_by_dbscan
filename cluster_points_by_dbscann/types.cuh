@@ -21,20 +21,6 @@ struct PointIndex
 };
 
 
-class NonzeroCoords
-{
-public:
-	NonzeroCoords(int num_points, cudaStream_t* stream);
-	~NonzeroCoords();
-
-
-	int _num_points = 0;
-	PointXY* _coords;
-private:
-	cudaStream_t* _stream;
-};
-
-
 namespace clustering
 {
 	namespace cuda

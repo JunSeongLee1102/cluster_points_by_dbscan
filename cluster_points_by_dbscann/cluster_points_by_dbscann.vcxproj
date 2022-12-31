@@ -141,7 +141,6 @@
     <ClInclude Include="dbscan.cuh" />
     <ClInclude Include="gpumat_find_nonzero.cuh" />
     <ClInclude Include="types.cuh" />
-    <ClInclude Include="uled_brightness_calculation.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="cluster_points.cpp" />
@@ -150,7 +149,6 @@
   <ItemGroup>
     <CudaCompile Include="dbscan.cu" />
     <CudaCompile Include="gpumat_find_nonzero.cu" />
-    <CudaCompile Include="types.cu" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

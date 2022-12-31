@@ -41,7 +41,7 @@ void makeImgSaveDirectory(bool draw_result)
 			std::string dir_name = "saved_images";
 			std::wstring widestr_dir_name = std::wstring(dir_name.begin(), dir_name.end());
 			const wchar_t* wchar_dir_name = widestr_dir_name.c_str();
-			printf("cannot access %s, create directory.\n", "saved_images");
+			printf("cannot access to %s, create directory.\n", "saved_images");
 			check_directory_creation = _wmkdir(wchar_dir_name);
 			if (!check_directory_creation)
 				printf("Directory created\n");

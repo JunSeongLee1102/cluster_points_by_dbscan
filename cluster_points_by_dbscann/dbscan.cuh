@@ -27,19 +27,19 @@ using cv::cuda::GpuMat;
 class Dbscan
 {
 public:
-	int _num_samples;
-	float _eps;
-	int _min_points;
-	GpuMat _gpumat_sample;
-	int* _index_list;
-	int* _max_ind_num;
-	float _divide_factor;
-	int _buffer_size;
-	int _init_grid;
-	int _init_block;
+	int num_samples_;
+	float eps_;
+	int min_points_;
+	GpuMat gpumat_sample_;
+	int* index_list_;
+	int* max_ind_num_;
+	float divide_factor_;
+	int buffer_size_;
+	int init_grid_;
+	int init_block_;
 
-	cudaStream_t* _stream;
-	cv::cuda::Stream* _cv_stream;
+	cudaStream_t* stream_;
+	cv::cuda::Stream* cv_stream_;
 
 	Dbscan(float divide_factor = 5.0, float eps = 4.0, int min_points = 5, int buffer_size = 1500, cudaStream_t* stream = nullptr, cv::cuda::Stream* cv_stream = nullptr);
 	~Dbscan();
@@ -49,13 +49,13 @@ public:
 	int** Clustering();
 
 private:
-	PointXY* _host_sample;
-	PointIndex* _host_index;
-	PointXY* _cuda_sample;
-	bool _is_cuda_sample_malloced = false;
-	PointIndex* _gpu_index;
-	int* _dev_neighbor;
-	int* _host_neighbor;
+	PointXY* host_sample_;
+	PointIndex* host_index_;
+	PointXY* cuda_sample_;
+	bool is_cuda_sample_malloced_ = false;
+	PointIndex* gpu_index_;
+	int* dev_neighbor_;
+	int* host_neighbor_;
 
 	void hostAlgorithmDbscan();
 };

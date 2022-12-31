@@ -23,19 +23,19 @@ public:
 	int      _num_nonzeros;
 	PointXY* _nonzero_xy_coords;
 private:
-	cudaStream_t* _stream;
-	int _rows;
-	int _cols;
-	int _step;
-	int _max_num_nonzeros;
+	cudaStream_t* stream_;
+	int rows_;
+	int cols_;
+	int step_;
+	int max_num_nonzeros_;
 
-	int _row_block_size;
-	int _col_block_size;
+	int row_block_size_;
+	int col_block_size_;
 
-	dim3 _block;
-	dim3 _grid;
-	int* _cpu_num_nonzeros;
-	int* _gpu_num_nonzeros;
+	dim3 block_;
+	dim3 grid_;
+	int* cpu_num_nonzeros_;
+	int* gpu_num_nonzeros_;
 };
 
 

@@ -14,11 +14,11 @@ void display(Mat image, int x_size = 1000, int y_size = 1000)
 }
 
 
-void display(GpuMat gpu_image, int x_size = 1000, int y_size = 1000, cv::cuda::Stream _cv_stream = cv::cuda::Stream())
+void display(GpuMat gpu_image, int x_size = 1000, int y_size = 1000, cv::cuda::Stream cv_stream_ = cv::cuda::Stream())
 {
 	Mat vis_image;
-	gpu_image.download(vis_image, _cv_stream);
-	_cv_stream.waitForCompletion();
+	gpu_image.download(vis_image, cv_stream_);
+	cv_stream_.waitForCompletion();
 
 	cv::resize(vis_image, vis_image, cv::Size(x_size, y_size), 0, 0, cv::INTER_AREA);
 	cv::imshow("Sample", vis_image);
@@ -33,21 +33,21 @@ ClusterPoints::ClusterPoints()
 
 void ClusterPoints::initialize(bool use_gpumat_find_nonzero, bool draw_result)
 {
-	_use_gpumat_find_nonzero = use_gpumat_find_nonzero;
-	_draw_result = draw_result;
+	use_gpumat_find_nonzero_ = use_gpumat_find_nonzero;
+	draw_result_ = draw_result;
 
 	//병렬화 위한 cudaStream 생성
-	//cv::cuda::Stream 생성 및 해당 _stream과 같은 CUDA에서의 cudaStream_t get
-	_cv_stream = new cv::cuda::Stream();
-	_stream = new cudaStream_t();
-	_stream[0] = cv::cuda::StreamAccessor::getStream(_cv_stream[0]);
+	//cv::cuda::Stream 생성 및 해당 stream_과 같은 CUDA에서의 cudaStream_t get
+	cv_stream_ = new cv::cuda::Stream();
+	stream_ = new cudaStream_t();
+	stream_[0] = cv::cuda::StreamAccessor::getStream(cv_stream_[0]);
 
-	//clustering을 위한 _dbscan 구조체 생성
-	_dbscan = new Dbscan(32.0, 4.0, 5, 10000, _stream, _cv_stream);
+	//clustering을 위한 dbscan_ 구조체 생성
+	dbscan_ = new Dbscan(32.0, 4.0, 5, 10000, stream_, cv_stream_);
 
 	//사각형들 그려진 이미지
-	_original_sample_img = cv::Mat(5000, 5000, CV_8UC1);
-	_original_sample_img.setTo(0);
+	original_sample_img_ = cv::Mat(5000, 5000, CV_8UC1);
+	original_sample_img_.setTo(0);
 
 	//이미지에 사각형들 추가
 	//사각형들 중심 간 거리
@@ -56,33 +56,33 @@ void ClusterPoints::initialize(bool use_gpumat_find_nonzero, bool draw_result)
 	{
 		for (int yj = 0; yj < 3; yj++)
 		{
-			cv::rectangle(_original_sample_img, cv::Point(800 + xi * interval, 800 + yj * interval), cv::Point(930 + xi * interval, 930 + yj * interval), cv::Scalar(255), -1);
+			cv::rectangle(original_sample_img_, cv::Point(800 + xi * interval, 800 + yj * interval), cv::Point(930 + xi * interval, 930 + yj * interval), cv::Scalar(255), -1);
 		}
 	}
 
 	GpuMat gpu_sample_img;
-	gpu_sample_img.upload(_original_sample_img, _cv_stream[0]);
-	_cv_stream[0].waitForCompletion();
+	gpu_sample_img.upload(original_sample_img_, cv_stream_[0]);
+	cv_stream_[0].waitForCompletion();
 
-	if (_use_gpumat_find_nonzero)
-		_gpumat_find_nonzero = new GpuMatFindNonzero(_original_sample_img.rows, _original_sample_img.cols, gpu_sample_img.step, 10000, _stream);
+	if (use_gpumat_find_nonzero_)
+		gpumat_find_nonzero_ = new GpuMatFindNonzero(original_sample_img_.rows, original_sample_img_.cols, gpu_sample_img.step, 10000, stream_);
 
-	if (_draw_result)
+	if (draw_result_)
 	{
 		std::string save_image_name = "saved_images/original_rects";
 		save_image_name += ".jpg";
-		cv::imwrite(save_image_name, _original_sample_img);
+		cv::imwrite(save_image_name, original_sample_img_);
 	}
 }
 
 
 ClusterPoints::~ClusterPoints()
 {
-	if (_use_gpumat_find_nonzero)
-		delete _gpumat_find_nonzero;
-	delete _cv_stream;
-	delete _stream;
-	delete _dbscan;
+	if (use_gpumat_find_nonzero_)
+		delete gpumat_find_nonzero_;
+	delete cv_stream_;
+	delete stream_;
+	delete dbscan_;
 }
 
 
@@ -98,33 +98,33 @@ void ClusterPoints::clusterRectsInImage(int save_image_index)
 	int** cluster_colors;
 	int num_clusters = 0;
 
-	gpu_sample_img.upload(_original_sample_img, _cv_stream[0]);
-	canny->detect(gpu_sample_img, gpu_sample_img, _cv_stream[0]);
+	gpu_sample_img.upload(original_sample_img_, cv_stream_[0]);
+	canny->detect(gpu_sample_img, gpu_sample_img, cv_stream_[0]);
 
-	if (_use_gpumat_find_nonzero)
+	if (use_gpumat_find_nonzero_)
 	{
-		_gpumat_find_nonzero->findNonzero(gpu_sample_img);
-		_dbscan->PrepareToProcess(_gpumat_find_nonzero->_num_nonzeros, 32.0, 4.0, 5, (_gpumat_find_nonzero->_nonzero_xy_coords));
-		num_nonzeros = _gpumat_find_nonzero->_num_nonzeros;
+		gpumat_find_nonzero_->findNonzero(gpu_sample_img);
+		dbscan_->PrepareToProcess(gpumat_find_nonzero_->_num_nonzeros, 32.0, 4.0, 5, (gpumat_find_nonzero_->_nonzero_xy_coords));
+		num_nonzeros = gpumat_find_nonzero_->_num_nonzeros;
 	}
 	else
 	{
-		gpu_sample_img.download(sample_img, _cv_stream[0]);
-		_cv_stream[0].waitForCompletion();
+		gpu_sample_img.download(sample_img, cv_stream_[0]);
+		cv_stream_[0].waitForCompletion();
 		cv::findNonZero(sample_img, sample_img_nonzeros);
 		num_nonzeros = sample_img_nonzeros.rows;
-		_dbscan->PrepareToProcess(sample_img_nonzeros.rows, 32.0, 4.0, 5, sample_img_nonzeros);
+		dbscan_->PrepareToProcess(sample_img_nonzeros.rows, 32.0, 4.0, 5, sample_img_nonzeros);
 
 	}
 
-	cluster_result = _dbscan->Clustering();
+	cluster_result = dbscan_->Clustering();
 
 	for (int i = 0; i < num_nonzeros; i++)	
 		num_clusters = max(cluster_result[i][2], num_clusters);
 	
 	num_clusters += 2;
 
-	if (_draw_result)
+	if (draw_result_)
 	{
 		cluster_colors = new int* [num_clusters];
 		int seed1 = rand() % 255;

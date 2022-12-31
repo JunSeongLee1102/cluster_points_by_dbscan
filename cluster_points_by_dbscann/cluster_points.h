@@ -25,14 +25,14 @@ public:
 	~ClusterPoints();
 	void clusterRectsInImage(int save_image_index);
 private:
-	bool _use_gpumat_find_nonzero;
-	bool _draw_result;
-	Dbscan* _dbscan;
-	cv::cuda::Stream* _cv_stream;
-	cudaStream_t* _stream;
+	bool use_gpumat_find_nonzero_;
+	bool draw_result_;
+	Dbscan* dbscan_;
+	cv::cuda::Stream* cv_stream_;
+	cudaStream_t* stream_;
 
-	GpuMatFindNonzero* _gpumat_find_nonzero;
+	GpuMatFindNonzero* gpumat_find_nonzero_;
 
-	Mat _original_sample_img;
-	GpuMat _gpu_original_sample_img;
+	Mat original_sample_img_;
+	GpuMat gpu_original_sample_img_;
 };

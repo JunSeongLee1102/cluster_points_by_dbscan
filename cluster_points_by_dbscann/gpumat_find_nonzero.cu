@@ -26,55 +26,55 @@ void kernelFindNonzero(unsigned char* gpu_image_data, int rows, int cols, int st
 
 GpuMatFindNonzero::GpuMatFindNonzero(int rows, int cols, int step, int max_num_nonzeros, cudaStream_t* stream)
 {
-	_rows = rows;
-	_cols = cols;
-	_step = step;
-	_max_num_nonzeros = max_num_nonzeros;
+	rows_ = rows;
+	cols_ = cols;
+	step_ = step;
+	max_num_nonzeros_ = max_num_nonzeros;
 
 	//consider warp thread size
-	_row_block_size = int(rows / 32 + 1);
-	_col_block_size = int(cols / 32 + 1);
+	row_block_size_ = int(rows / 32 + 1);
+	col_block_size_ = int(cols / 32 + 1);
 
-	_grid = dim3(_col_block_size, _row_block_size);
-	_block = dim3(32, 32);
+	grid_ = dim3(col_block_size_, row_block_size_);
+	block_ = dim3(32, 32);
 
-	_cpu_num_nonzeros = new int[1];
-	_cpu_num_nonzeros[0] = 0;
+	cpu_num_nonzeros_ = new int[1];
+	cpu_num_nonzeros_[0] = 0;
 
-	_stream = stream;
+	stream_ = stream;
 
-	HANDLE_ERROR(cudaMallocAsync((void**)&_gpu_num_nonzeros, sizeof(int), _stream[0]));
-	HANDLE_ERROR(cudaMemsetAsync(_gpu_num_nonzeros, 0, sizeof(int), _stream[0]));
-	HANDLE_ERROR(cudaMallocAsync((void**)&_nonzero_xy_coords, 2 * _max_num_nonzeros * sizeof(int), _stream[0]));
+	HANDLE_ERROR(cudaMallocAsync((void**)&gpu_num_nonzeros_, sizeof(int), stream_[0]));
+	HANDLE_ERROR(cudaMemsetAsync(gpu_num_nonzeros_, 0, sizeof(int), stream_[0]));
+	HANDLE_ERROR(cudaMallocAsync((void**)&_nonzero_xy_coords, 2 * max_num_nonzeros_ * sizeof(int), stream_[0]));
 
-	HANDLE_ERROR(cudaStreamSynchronize(_stream[0]));
+	HANDLE_ERROR(cudaStreamSynchronize(stream_[0]));
 }
 
 
 GpuMatFindNonzero::~GpuMatFindNonzero()
 {
-	HANDLE_ERROR(cudaFreeAsync(_gpu_num_nonzeros, _stream[0]));
-	HANDLE_ERROR(cudaFreeAsync(_nonzero_xy_coords, _stream[0]));
+	HANDLE_ERROR(cudaFreeAsync(gpu_num_nonzeros_, stream_[0]));
+	HANDLE_ERROR(cudaFreeAsync(_nonzero_xy_coords, stream_[0]));
 
-	delete[] _cpu_num_nonzeros;
+	delete[] cpu_num_nonzeros_;
 
 
-	HANDLE_ERROR(cudaStreamSynchronize(_stream[0]));
+	HANDLE_ERROR(cudaStreamSynchronize(stream_[0]));
 }
 
 
 void GpuMatFindNonzero::findNonzero(cv::cuda::GpuMat gpu_image)
 {
-	HANDLE_ERROR(cudaMemsetAsync(_gpu_num_nonzeros, 0, sizeof(int), _stream[0]));
+	HANDLE_ERROR(cudaMemsetAsync(gpu_num_nonzeros_, 0, sizeof(int), stream_[0]));
 
-	kernelFindNonzero << <_grid, _block, 0, _stream[0] >> > (reinterpret_cast<unsigned char*>(gpu_image.data), _rows,
-		_cols, _step, _nonzero_xy_coords, _gpu_num_nonzeros);
+	kernelFindNonzero << <grid_, block_, 0, stream_[0] >> > (reinterpret_cast<unsigned char*>(gpu_image.data), rows_,
+		cols_, step_, _nonzero_xy_coords, gpu_num_nonzeros_);
 
-	HANDLE_ERROR(cudaMemcpyAsync(&_cpu_num_nonzeros[0], &_gpu_num_nonzeros[0], sizeof(int),
-		cudaMemcpyDeviceToHost, _stream[0]));
+	HANDLE_ERROR(cudaMemcpyAsync(&cpu_num_nonzeros_[0], &gpu_num_nonzeros_[0], sizeof(int),
+		cudaMemcpyDeviceToHost, stream_[0]));
 
-	HANDLE_ERROR(cudaStreamSynchronize(_stream[0]));
+	HANDLE_ERROR(cudaStreamSynchronize(stream_[0]));
 
-	_num_nonzeros = _cpu_num_nonzeros[0];
+	_num_nonzeros = cpu_num_nonzeros_[0];
 	return;
 }

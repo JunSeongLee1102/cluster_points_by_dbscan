@@ -18,9 +18,6 @@
     <ClInclude Include="cluster_points.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="uled_brightness_calculation.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="cuda_utils.cuh">
       <Filter>헤더 파일</Filter>
     </ClInclude>
@@ -47,9 +44,6 @@
       <Filter>소스 파일</Filter>
     </CudaCompile>
     <CudaCompile Include="gpumat_find_nonzero.cu">
-      <Filter>소스 파일</Filter>
-    </CudaCompile>
-    <CudaCompile Include="types.cu">
       <Filter>소스 파일</Filter>
     </CudaCompile>
   </ItemGroup>
